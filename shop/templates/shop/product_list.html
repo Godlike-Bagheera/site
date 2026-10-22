@@ -1,0 +1,71 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Каталог товаров</h1>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Категория</label>
+                <select name="category" class="form-select">
+                    <option value="">Все категории</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == current_category %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Цена от</label>
+                <input type="number" name="min_price" class="form-control" value="{{ min_price }}" placeholder="">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Цена до</label>
+                <input type="number" name="max_price" class="form-control" value="{{ max_price }}" placeholder="">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Фильтр</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ product.category.name }}</h6>
+                <p class="card-text fs-4 text-primary fw-bold">{{ product.price }} ₽</p>
+            </div>
+            <div class="card-footer bg-white border-top-0">
+                <a href="{% url 'product-detail' product.pk %}" class="btn btn-outline-primary w-100">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">По вашему запросу товаров не найдено.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

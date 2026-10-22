@@ -1,0 +1,57 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'product-list' %}">Каталог</a></li>
+    <li class="breadcrumb-item active">{{ product.name }}</li>
+  </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h1>{{ product.name }}</h1>
+                <h4 class="text-muted mb-3">Категория: {{ product.category.name }}</h4>
+                <p class="fs-3 text-primary fw-bold">{{ product.price }} ₽</p>
+                <p>{{ product.description|default:"Описание отсутствует." }}</p>
+
+                {% if user.is_authenticated %}
+                <form action="{% url 'order-create' %}" method="post" class="mt-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.pk }}">
+                    <button type="submit" class="btn btn-success btn-lg">Заказать</button>
+                </form>
+                {% else %}
+                <div class="alert alert-warning mt-4">Пожалуйста, войдите в систему, чтобы сделать заказ.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+<h3>Отзывы</h3>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'review-create' product.pk %}" class="btn btn-sm btn-outline-secondary mb-3">Оставить отзыв</a>
+{% endif %}
+
+<div class="list-group mb-4">
+    {% for review in product.reviews.all %}
+    <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Оценка: {{ review.rating }}/5 ⭐</h5>
+            <small>{{ review.created_at|date:"d M Y" }}</small>
+        </div>
+        <p class="mb-1">{{ review.text|default:"Без текста" }}</p>
+        <small class="text-muted">Пользователь: {{ review.user.username }}</small>
+    </div>
+    {% empty %}
+    <div class="alert alert-light">Отзывов пока нет</div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Отчёт по продажам</h1>
+<form method="get">
+    <label>С: <input type="date" name="start" value="{{ start }}"></label>
+    <label>По: <input type="date" name="end" value="{{ end }}"></label>
+    <button type="submit">Показать</button>
+</form>
+<p><strong>Итого продаж: {{ total_sales }} ₽</strong></p>
+<ul>
+    {% for order in orders %}
+    <li>Заказ №{{ order.id }} — {{ order.total }} ₽ ({{ order.created_at }})</li>
+    {% empty %}
+    <li>Нет заказов за выбранный период.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
